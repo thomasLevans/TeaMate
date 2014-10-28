@@ -1,0 +1,14 @@
+import org.martus.server.main
+
+public class AppendWithColonTermDriver{
+	protected static MartusServer;
+	public static void main(String[] args){
+
+	}
+	public static void setup(){
+
+	}
+	public static void tearDown(){
+
+	}
+}

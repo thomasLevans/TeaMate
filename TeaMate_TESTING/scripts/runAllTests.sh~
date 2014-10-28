@@ -1,0 +1,58 @@
+#!/bin/bash
+
+# clean temp directory and reports directory
+echo "clearing old files..."
+echo "dirname $BASH_SOURCE"
+rm -f -r ./temp/*.txt
+rm -f -r ./reports/testReport.html
+
+# get all the testCases file names as an array
+files=(./testCases/*.txt)
+echo "reading testCase Files..."
+
+# for every testCase file in the array process the file
+for file in "${files[@]}"; do
+	index=0
+	declare -a testDat
+	# reads in lines from the testCase file
+	# and stores each line in the array
+	while read LINE
+	do
+		testDat[index]=$LINE
+		let "index+=1"
+	done < "$file"
+	let "index+=1"
+
+	javac -cp .:./project/martus-utils/bin/ ./testCasesExecutables/DelimiterDriver.java
+
+	# this is for call concat later
+	javaCall="java -cp .:./project/martus-utils/bin/:./testCasesExecutables/ DelimiterDriver "
+	echo "running test ${testDat[0]}"
+	testDat[index]="$(java -cp .:./project/martus-utils/bin/:./testCasesExecutables/ DelimiterDriver ${testDat[4]})"
+	echo ${testDat[$index]} > ./temp/tempResults${testDat[0]}.txt
+
+	if diff ./oracles/testOracle${testDat[0]}.txt ./temp/tempResults${testDat[0]}.txt; then
+		testDat[5]="PASS"
+	else
+		testDat[5]="FAIL"
+	fi
+	echo "creating tempResults${testDat[0]}.txt..."
+	echo ${testDat[@]} > ./temp/tempResults${testDat[0]}.txt
+done
+
+echo "creating reportFile.html..."
+files=(./temp/*.txt)
+echo "<html><head><title>Test Report</title><h1>Test Report</h1><hr></head><body><table>" >> ./reports/testReport.html
+echo "<tr><th>Test #</th><th>Package</th><th>Class</th><th>Method</th><th>Input</th><th>Test Result</th><th>Result Value</th></tr>" >> ./reports/testReport.html
+for file in "${files[@]}"; do
+	echo "<tr>" >> ./reports/testReport.html
+	while read LINE; do
+		for WORD in $LINE; do
+		echo "<td align="right">$WORD</td>" >> ./reports/testReport.html
+		done
+	done < "$file"
+	echo "</tr>" >> ./reports/testReport.html
+done
+echo "</table></body></html>" >> ./reports/testReport.html
+echo "opening reportFile.html..."
+xdg-open ./reports/testReport.html

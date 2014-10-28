@@ -1,0 +1,20 @@
+import org.martus.logi
+
+public class HexStringDriver{
+	protected static Crypto runner;
+
+	public static void main(String[] args){
+		setup();
+		//figure out how to deal with type for command line arg
+		System.out.print(runner.hexString(//something here can be long int or string types));
+		tearDown();
+	}
+
+	public static void setup(){
+		runner = new Crypto();
+	}
+
+	public static void tearDown(){
+		runner = null;
+	}	
+}
